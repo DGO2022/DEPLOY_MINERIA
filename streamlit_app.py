@@ -12,6 +12,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -32,7 +33,16 @@ def cargar_modelo_y_preprocesador():
         MODEL_PATH = Path("artefactos") / "modelo_rna_combustible.keras"
         PREP_PATH = Path("artefactos") / "preprocesador_rna.pkl"
         
-        modelo = keras.models.load_model(MODEL_PATH)
+        # Cargar con compile=False
+        modelo = tf.keras.models.load_model(MODEL_PATH, compile=False)
+
+        # Recompilar manualmente
+        modelo.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss="mse",
+    metrics=["mae", "mse"]
+)
+        
         preprocesador = joblib.load(PREP_PATH)
         
         return modelo, preprocesador, None
@@ -247,8 +257,8 @@ with tab3:
     st.markdown("### 1. Distribución de Errores del Modelo")
     
     # Simulación de distribución de errores (distribución normal centrada en 0)
-    np.random.seed(42)
-    errors = np.random.normal(0, 12.41, 1000)
+    rng = np.random.default_rng(42)
+    errors = rng.normal(0, 12.41, 1000)
     
     fig1, ax1 = plt.subplots(figsize=(10, 5))
     ax1.hist(errors, bins=40, edgecolor='black', alpha=0.7, color='skyblue')
@@ -268,9 +278,10 @@ with tab3:
     st.markdown("### 2. Curvas de Aprendizaje (Entrenamiento)")
     
     # Simulación de curvas de entrenamiento
+    rng2 = np.random.default_rng(123)
     epochs = np.arange(1, 54)
-    train_loss = 1500 * np.exp(-0.05 * epochs) + np.random.normal(0, 50, len(epochs)) + 1200
-    val_loss = 1400 * np.exp(-0.05 * epochs) + np.random.normal(0, 60, len(epochs)) + 900
+    train_loss = 1500 * np.exp(-0.05 * epochs) + rng2.normal(0, 50, len(epochs)) + 1200
+    val_loss = 1400 * np.exp(-0.05 * epochs) + rng2.normal(0, 60, len(epochs)) + 900
     
     fig2, (ax2a, ax2b) = plt.subplots(1, 2, figsize=(14, 5))
     
@@ -284,8 +295,9 @@ with tab3:
     ax2a.grid(True, alpha=0.3)
     
     # MAE
-    train_mae = 14 * np.exp(-0.03 * epochs) + np.random.normal(0, 0.3, len(epochs)) + 12.5
-    val_mae = 13 * np.exp(-0.03 * epochs) + np.random.normal(0, 0.4, len(epochs)) + 10
+    rng3 = np.random.default_rng(456)
+    train_mae = 14 * np.exp(-0.03 * epochs) + rng3.normal(0, 0.3, len(epochs)) + 12.5
+    val_mae = 13 * np.exp(-0.03 * epochs) + rng3.normal(0, 0.4, len(epochs)) + 10
     
     ax2b.plot(epochs, train_mae, label='Entrenamiento', linewidth=2)
     ax2b.plot(epochs, val_mae, label='Validación', linewidth=2)
