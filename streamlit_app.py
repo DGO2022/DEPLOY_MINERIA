@@ -4,10 +4,20 @@ import pandas as pd
 import numpy as np
 import joblib
 from pathlib import Path
+import os
+
+# Configurar variables de entorno ANTES de importar TensorFlow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+# Deshabilitar warnings de matplotlib
+import warnings
+warnings.filterwarnings('ignore')
 
 # Configuración de página
 st.set_page_config(page_title="Predicción RNA Combustibles", page_icon="⛽", layout="wide")
