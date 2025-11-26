@@ -118,6 +118,9 @@ with tab1:
     
     # Botón de predicción
     if st.button("Predecir", type="primary"):
+        if codigo_osinergmin != "aef48fddb6" or punto_abastecimiento != "7cf5cc2019":
+            st.error("no existe tales codigos")
+            st.stop()
         try:
             # Crear DataFrame
             entrada = pd.DataFrame([data])
